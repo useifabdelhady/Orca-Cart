@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-   public class ProductRepository(StoreContext context) : IProductRepository
+  public class ProductRepository(StoreContext context) : IProductRepository
 {
     public void AddProduct(Product product)
     {
