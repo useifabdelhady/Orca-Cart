@@ -11,9 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
-    [ApiController]
+   [ApiController]
 [Route("api/[controller]")]
-   public class BaseApiController : ControllerBase
+public class BaseApiController : ControllerBase
 {
     protected async Task<ActionResult> CreatePagedResult<T>(IGenericRepository<T> repo,
         ISpecification<T> spec, int pageIndex, int pageSize) where T : BaseEntity

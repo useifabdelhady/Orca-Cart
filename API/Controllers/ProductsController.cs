@@ -13,9 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
-    [ApiController]
-[Route("api/[controller]")]
-   public class ProductsController(IUnitOfWork unit) : BaseApiController
+  public class ProductsController(IUnitOfWork unit) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(

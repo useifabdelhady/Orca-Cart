@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
- public class SpecificationEvaluator<T> where T : BaseEntity
+public class SpecificationEvaluator<T> where T : BaseEntity
 {
     public static IQueryable<T> GetQuery(IQueryable<T> query, ISpecification<T> spec)
     {
@@ -35,6 +36,9 @@ namespace Infrastructure.Repository
         {
             query = query.Skip(spec.Skip).Take(spec.Take);
         }
+
+        query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
+        query = spec.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
 
         return query;
     }

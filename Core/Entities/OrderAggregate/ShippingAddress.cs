@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core.Entities.OrderAggregate
 {
-    public class ShippingAddress
+public class ShippingAddress
 {
     public required string Name { get; set; }
     public required string Line1 { get; set; }
