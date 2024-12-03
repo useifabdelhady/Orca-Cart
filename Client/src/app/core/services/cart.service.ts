@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
-import { Cart, CartItem } from '../../shared/models/cart';
+import { Cart, CartItem, Coupon } from '../../shared/models/cart';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom, map, tap } from 'rxjs';
 import { Product } from '../../shared/models/product';
 import { environment } from '../../../environments/environment';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
