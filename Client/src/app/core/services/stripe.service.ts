@@ -19,12 +19,15 @@ export class StripeService {
   private elements?: StripeElements;
   private addressElement?: StripeAddressElement;
   private paymentElement?: StripePaymentElement;
+
   constructor() {
     this.stripePromise = loadStripe(environment.stripePublicKey);
   }
+
   getStripeInstance() {
     return this.stripePromise;
   }
+
   async initializeElements() {
     if (!this.elements) {
       const stripe = await this.getStripeInstance();
@@ -38,6 +41,7 @@ export class StripeService {
     }
     return this.elements;
   }
+
   async createPaymentElement() {
     if (!this.paymentElement) {
       const elements = await this.initializeElements();
@@ -49,15 +53,18 @@ export class StripeService {
     }
     return this.paymentElement;
   }
+
   async createAddressElement() {
     if (!this.addressElement) {
       const elements = await this.initializeElements();
       if (elements) {
         const user = this.accountService.currentUser();
         let defaultValues: StripeAddressElementOptions['defaultValues'] = {};
+
         if (user) {
           defaultValues.name = user.firstName + ' ' + user.lastName;
         }
+
         if (user?.address) {
           defaultValues.address  = {
             line1: user.address.line1,
@@ -68,6 +75,7 @@ export class StripeService {
             postal_code: user.address.postalCode
           }
         }
+
         const options: StripeAddressElementOptions = {
           mode: 'shipping',
           defaultValues
@@ -79,6 +87,7 @@ export class StripeService {
     }
     return this.addressElement;
   }
+
   async createConfirmationToken() {
     const stripe = await this.getStripeInstance();
     const elements = await this.initializeElements();
@@ -90,12 +99,15 @@ export class StripeService {
       throw new Error('Stripe not available');
     }
   }
+
   async confirmPayment(confirmationToken: ConfirmationToken) {
     const stripe = await this.getStripeInstance();
     const elements = await this.initializeElements();
     const result = await elements.submit();
     if (result.error) throw new Error(result.error.message);
+
     const clientSecret = this.cartService.cart()?.clientSecret;
+
     if (stripe && clientSecret) {
       return await stripe.confirmPayment({
         clientSecret: clientSecret,
@@ -108,20 +120,27 @@ export class StripeService {
       throw new Error('Unable to load stripe');
     }
   }
+
   createOrUpdatePaymentIntent() {
     const cart = this.cartService.cart();
+    const hasClientSecret = !!cart?.clientSecret;
     if (!cart) throw new Error('Problem with cart');
     return this.http.post<Cart>(this.baseUrl + 'payments/' + cart.id, {}).pipe(
-      map(cart => {
-        this.cartService.setCart(cart);
+      map(async cart => {
+        if (!hasClientSecret) {
+          await firstValueFrom(this.cartService.setCart(cart));
+          return cart;
+        }
         return cart;
       })
     )
   }
+
   disposeElements() {
     this.elements = undefined;
     this.addressElement = undefined;
     this.paymentElement = undefined;
   }
+
 }
 

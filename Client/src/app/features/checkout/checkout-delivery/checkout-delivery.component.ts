@@ -4,6 +4,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import { DeliveryMethod } from '../../../shared/models/deliveryMethod';
 import { CheckoutService } from '../../../core/services/checkout.service';
 import { CartService } from '../../../core/services/cart.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-checkout-delivery',
@@ -19,6 +20,7 @@ export class CheckoutDeliveryComponent implements OnInit {
   checkoutService = inject(CheckoutService);
   cartService = inject(CartService);
   deliveryComplete = output<boolean>();
+
   ngOnInit(): void {
     this.checkoutService.getDeliveryMethods().subscribe({
       next: methods => {
@@ -32,12 +34,13 @@ export class CheckoutDeliveryComponent implements OnInit {
       }
     });
   }
-  updateDeliveryMethod(method: DeliveryMethod) {
+
+  async updateDeliveryMethod(method: DeliveryMethod) {
     this.cartService.selectedDelivery.set(method);
     const cart = this.cartService.cart();
     if (cart) {
       cart.deliveryMethodId = method.id;
-      this.cartService.setCart(cart);
+      await firstValueFrom(this.cartService.setCart(cart));
       this.deliveryComplete.emit(true);
     }
   }
